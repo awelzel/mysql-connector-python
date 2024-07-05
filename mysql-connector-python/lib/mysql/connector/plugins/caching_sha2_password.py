@@ -101,7 +101,9 @@ class MySQLCachingSHA2PasswordAuthPlugin(MySQLAuthPlugin):
         if len(auth_data) > 1:
             return self._scramble(auth_data)
         if auth_data[0] == self.perform_full_authentication:
-            # return password as clear text.
+            # return password as clear text if SSL is enabled.
+            if not self.ssl_enabled:
+                raise InterfaceError(f"{self.name} full authentication requires SSL")
             return self._password.encode() + b"\x00"
 
         return None
